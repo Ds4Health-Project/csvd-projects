@@ -1,5 +1,4 @@
 # Projeto CSVD
-# Project CSVD
 
 > |Nome  | RA | Especialização|
 > |--|--|--|
