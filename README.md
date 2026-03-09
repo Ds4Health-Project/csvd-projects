@@ -1,4 +1,5 @@
-# Projeto CSVD
+# Projeto Ciência de redes aplicada à toxicidade de microplásticos em pulmões humanos
+# Project Network science applied to microplastic toxicity in human lungs.
 
 > |Nome  | RA | Especialização|
 > |--|--|--|
