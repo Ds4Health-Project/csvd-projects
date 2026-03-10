@@ -48,8 +48,12 @@ A inalação de micro e nanoplásticos (MNPs) representa uma via de exposição 
 # Ferramentas
 
 - NetworkX
+- Graph-Tool
+- Py4Cytoscape
+- PyDESeq2
+- PyWGCNA
+- Scanpy
 - Plotly
-- MatplotLib
 
 # Referências Bibliográficas
 
