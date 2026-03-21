@@ -35,10 +35,6 @@ A inalação de micro e nanoplásticos (MNPs) representa uma via de exposição 
 
 # Modelo Lógico
 
-> Modelo lógico da base de grafos que será construída. Para o modelo de grafos de propriedades, utilize este
-> [modelo de base](https://docs.google.com/presentation/d/10RN7bDKUka_Ro2_41WyEE76Wxm4AioiJOrsh6BRY3Kk/edit?usp=sharing) para construir o seu.
-> Coloque a imagem do PNG do seu modelo lógico como ilustrado abaixo (a imagem estará na pasta `image`):
->
 > ![Modelo Lógico de Grafos](images/modelo-logico-grafos.png)
 
 # Metodologia
