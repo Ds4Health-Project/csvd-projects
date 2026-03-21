@@ -30,8 +30,8 @@ A inalação de micro e nanoplásticos (MNPs) representa uma via de exposição 
 
 > Base de Dados | Endereço na Web | Resumo descritivo
 > ----- | ----- | -----
-> Título da Base 1 | http://base1.org/ | Breve resumo (duas ou três linhas) sobre a base.
-> Título da Base 2 | http://base2.org/ | Breve resumo (duas ou três linhas) sobre a base.
+> GSE296007 | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE296007 | Breve resumo (duas ou três linhas) sobre a base.
+> PRJNA868178 | https://www.ncbi.nlm.nih.gov/sra/?term=PRJNA868178 | Breve resumo (duas ou três linhas) sobre a base.
 
 # Modelo Lógico
 
@@ -42,21 +42,39 @@ A inalação de micro e nanoplásticos (MNPs) representa uma via de exposição 
 > ![Modelo Lógico de Grafos](images/modelo-logico-grafos.png)
 
 # Metodologia
-> Esta seção evoluirá ao longo do projeto. Nesta primeira entrega, informe técnicas de Ciência de Redes que pretende explorar,
-> tais como: detecção de comunidades, análise de centralidade, predição de links, ou a combinação de uma ou mais técnicas. Descreva o que perguntas pretende endereçar cm a técnica escolhida.
+
+A metodologia integrará abordagens de transcriptômica e ciência de redes para mapear as respostas fenotípicas sistêmicas aos diferentes tamanhos de microplásticos, estruturando a pesquisa nas seguintes etapas:
+
+**1. Aquisição e Pré-processamento dos Dados (RNA-seq):**
+Os dados brutos e as matrizes de contagem serão obtidos a partir dos dados **PRJNA868178** e **GSE296007** utilizando ferramentas de extração como o SRA Toolkit. Após o controle de qualidade, quantificação e normalização dos dados para remover o viés de sequenciamento, buscaremos identificar quais genes são diferencialmente expressos nos HPFs frente à exposição às partículas de 0,1 µm e 1 µm em relação aos grupos controle.
+
+**2. Construção das Redes de Coexpressão:**
+Para responder como as partículas reconfiguram a topologia celular, utilizaremos as matrizes de expressão em redes onde os nós representam genes e as arestas representam a força de coexpressão entre eles, permitindo observar o sistema pulmonar de forma conectada e não como genes isolados.
+
+**3. Técnicas de Ciência de Redes:**
+
+* **Detecção de Comunidades:** Aplicaremos algoritmos para agrupar as redes em módulos de genes altamente conectados. Para testar a hipótese da pesquisa, extrairemos esses módulos e faremos análises de enriquecimento funcional (Gene Ontology e KEGG). A meta é verificar se os módulos associados à rede de partículas de 0,1 µm apresentam forte enriquecimento para "função mitocondrial", e se os módulos da rede de 1 µm concentram funções de "homeostase proteica" e "integridade de membrana".
+* **Análise de Centralidade e Hubs:** Para descobrir quais hubs controlam o estado de estresse celular, calcularemos métricas de centralidade (Grau, Intermediação e Autovetor). Os genes com as maiores pontuações nesses módulos de estresse serão apontados como os reguladores moleculares primários da transição fibrótica.
+* **Comparação Topológica:** Calcularemos métricas macroscópicas da rede como o coeficiente de agrupamento e o tamanho do caminho característico para demonstrar o nível de fragmentação ou resiliência da rede do hospedeiro quando exposta a diferentes tamanhos de partículas.
 
 # Ferramentas
 
-- NetworkX
-- Graph-Tool
-- Py4Cytoscape
-- PyDESeq2
-- PyWGCNA
-- Scanpy
-- Plotly
+Durante todo o projeto, isso é desde a aquisição dos arquivos no SRA até a visualização topológica, utilizaremos as seguintes ferramentas tecnologias:
+
+* **SRA Toolkit:** Essencial para o download e extração eficiente dos dados de sequenciamento brutos das bases públicas.
+* **FastQC / Kallisto (ou STAR):** Ferramentas de bioinformática necessárias para o controle de qualidade e a quantificação/alinhamento das *reads* de RNA.
+* **PyDESeq2:** Biblioteca em Python para análise de expressão gênica diferencial.
+* **PyWGCNA:** Construção da rede ponderada de coexpressão gênica baseada na variância dos tratamentos.
+* **NetworkX & Graph-Tool:** Bibliotecas centrais de Ciência de Redes para cálculos de centralidade, caminhos mínimos e aplicação de algoritmos de detecção de comunidades.
+* **GSEApy:** Realização de análises de enriquecimento de vias (GO/KEGG) para validar as funções biológicas associadas às hipóteses propostas.
+* **Py4Cytoscape:** Integração para renderização avançada da rede e customização de atributos visuais dos hubs.
+* **Scanpy:** Para análises exploratórias avançadas de agrupamento.
+* **Plotly:** Geração de gráficos estatísticos interativos associados às métricas topológicas da rede.
 
 # Referências Bibliográficas
 
-> Lista de artigos, links e referências bibliográficas.
->
-> Fiquem à vontade para escolher o padrão de referenciamento preferido pelo grupo.
+* Chwiej, J., et al. (2025). *Study on the respiratory toxicity of 0.1 µm and 1 µm polystyrene particles in human lung fibroblasts*. Gene Expression Omnibus, GSE296007. Disponível em: https://doi.org/10.1038/s41598-025-22947-7
+* Sainz, M., et al. (2024). *Application of Weighted Gene Co-expression Network Analysis (WGCNA) and Protein-Protein Interaction networks*. BMC Plant Biology. Disponível em: https://doi.org/10.1186/s12870-024-05280-5
+* Langfelder, P., & Horvath, S. (2008). *WGCNA: an R package for weighted correlation network analysis*. BMC Bioinformatics, 9(1), 559.
+* Love, M. I., Huber, W., & Anders, S. (2014). *Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2*. Genome Biology, 15(12), 550.
+* National Center for Biotechnology Information (NCBI). *Sequence Read Archive (SRA), Accession PRJNA868178*.
