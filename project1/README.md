@@ -35,7 +35,7 @@ A inalação de micro e nanoplásticos (MNPs) representa uma via de exposição 
 
 # Modelo Lógico
 
-> ![Modelo Lógico de Grafos](images/modelo-logico-grafos.png)
+> ![Modelo Lógico de Grafos](/assets/images/modelo-logico-grafos.png)
 
 # Metodologia
 
