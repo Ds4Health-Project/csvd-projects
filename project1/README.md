@@ -48,7 +48,7 @@ O estudo de Chwiej et al. (2025) mostrou que partículas de poliestireno de 100 
 
 # Modelo Lógico
 
-> ![Modelo Lógico de Grafos](/project1//assets/images/modelo-logico-grafos.png)
+> ![Modelo Lógico de Grafos](/project1//assets/images/modelo_logico.jpeg)
 
 # Metodologia
 
