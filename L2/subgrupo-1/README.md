@@ -29,9 +29,10 @@ A crescente produção e descarte de plásticos causam o acúmulo de micro e nan
 * **Arestas (Conexões):** Nas redes restritas ao fígado, as arestas representam a similaridade de coexpressão entre dois genes. Na rede integrada, as arestas representam a correlação estatística (Spearman) entre a presença de uma bactéria e a expressão de um gene.
 * **Pesos:** A espessura e o peso das arestas são determinados pelo valor da correlação estatística.
 
-> ![Modelo Lógico de Grafos 1](/L2/subgrupo-1/images/modelo-grafo.png)
-
-> ![Modelo Lógico de Grafos 2](/L2/subgrupo-1/images/modelo-grafo-artigo.png)
+***Modelo Exemplo***
+> ![Nosso Modelo Lógico do Grafos](/L2/subgrupo-1/images/modelo-grafo-artigo.png)
+***Nosso Modelo***
+> ![Referência do Artigo do Modelo Lógico do Grafo ](/L2/subgrupo-1/images/modelo-grafo.png)
 
 **Metodologia e Ciência de Redes**
 
