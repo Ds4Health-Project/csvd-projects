@@ -20,6 +20,7 @@
 # Resumo
 
 **Contexto e Objetivo**
+
 A crescente produção e descarte de plásticos causam o acúmulo de micro e nanoplásticos (MNPs) em ambientes aquáticos, onde são absorvidos pelos peixes via dieta ou respiração branquial. Neste contexto, o estudo investigou as diferenças no perfil de expressão gênica hepática e na microbiota intestinal da tilápia-do-nilo (*Oreochromis niloticus*) com base na via de exposição (dieta vs. água) aos MNPs.
 
 **Modelagem do Grafo**
@@ -42,12 +43,14 @@ O estudo aplicou a Análise de Rede de Coexpressão Gênica Ponderada (WGCNA) pa
 Adicionalmente, a microbiota intestinal foi analisada para compreender os mecanismos de dano hepático mediados pelo eixo intestino-fígado, utilizando escalonamento multidimensional não métrico (NMDS) em nível de variantes de sequência de amplicon (ASVs).
 
 **Principais Descobertas**
+
 A sobreposição das redes provou que diferentes vias de contaminação ativam eixos e respostas biológicas completamente distintas:
 
 * **Exposição via Dieta (Alimento):** Induz distúrbios hepáticos principalmente pela desregulação do ciclo circadiano. O fator de transcrição **thrb** atua como o gene *hub* responsável, cuja expressão é modulada conjuntamente pelos filos bacterianos intestinais *Firmicutes*, *Fusobacteriota*, *Proteobacteria* e *Chloroflexi*.
 * **Exposição via Água (Brânquias):** Desencadeia distúrbios metabólicos através de respostas imunológicas e inflamatórias. A rede tem como *hub* regulador o gene **fosl2**, que, por sua vez, é predominantemente modulado pelo filo bacteriano *Firmicutes*.
 
 **Conclusão**
+
 As análises indicaram que a ingestão de partículas pela dieta está relacionada à via do ciclo circadiano, enquanto a exposição pela água desencadeia uma resposta inflamatória primária que afeta o metabolismo, a microbiota intestinal também apresentou diferenças entre as vias de exposição. Assim, o estudo demonstra que diferentes vias de exposição ao plástico geram respostas biológicas distintas e reforça sua relevância para a compreensão dos impactos ambientais desses contaminantes em organismos aquáticos.
 
 ---
