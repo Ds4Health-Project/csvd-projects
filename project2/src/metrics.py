@@ -8,9 +8,7 @@ def calculate_log2fc(
     treatment_columns = [
         col for col in df.columns if col.startswith(f"{treatment_group}_")
     ]
-    control_columns = [
-        col for col in df.columns if col.startswith(f"{control_group}_")
-    ]
+    control_columns = [col for col in df.columns if col.startswith(f"{control_group}_")]
 
     treatment_mean = df[treatment_columns].mean(axis=1) + 1
     control_mean = df[control_columns].mean(axis=1) + 1
@@ -21,6 +19,7 @@ def calculate_log2fc(
     )
 
     return fc_result
+
 
 def filter_significant_genes(
     df: pd.DataFrame, target_column: str, threshold: float = 1.0
