@@ -42,3 +42,10 @@ def load_dataframe(file_path: str) -> pd.DataFrame:
 
 def save_dataframe(df: pd.DataFrame, file_path: str):
     df.to_csv(file_path, index=False)
+
+def save_module_gene_ids(module_dict: dict, output_dir: str):
+    os.makedirs(output_dir, exist_ok=True)
+    
+    for color, df in module_dict.items():
+        file_path = os.path.join(output_dir, f"wgcna_module_{color}.csv")
+        pd.Series(df.index, name="gene_id").to_csv(file_path, index=False)

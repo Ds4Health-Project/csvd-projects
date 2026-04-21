@@ -43,32 +43,41 @@ def filter_significant_genes(
 
     return filtered_df
 
-def run_wgcna_pipeline(counts_df: pd.DataFrame, top_n_genes: int, output_csv_path: str, trait_dict: dict) -> dict:
-    print(f"Starting WGCNA: Filtering top {top_n_genes} genes by MAD...")
+def run_pairwise_wgcna(counts_df: pd.DataFrame, treatment_prefix: str, control_prefix: str, top_n_genes: int, output_csv_path: str) -> dict:
     
     if "gene_id" in counts_df.columns:
         counts_df = counts_df.set_index("gene_id")
 
-    mad_genes = counts_df.apply(lambda x: np.median(np.abs(x - np.median(x))), axis=1)
+    treatment_cols = [col for col in counts_df.columns if col.startswith(f"{treatment_prefix}_")]
+    control_cols = [col for col in counts_df.columns if col.startswith(f"{control_prefix}_")]
+    
+    pairwise_samples = control_cols + treatment_cols
+    pairwise_df = counts_df[pairwise_samples]
+
+    mad_genes = pairwise_df.apply(lambda x: np.median(np.abs(x - np.median(x))), axis=1)
     selected_genes = mad_genes.nlargest(top_n_genes).index
-    filtered_df = counts_df.loc[selected_genes]
+    filtered_df = pairwise_df.loc[selected_genes]
 
     wgcna_df = filtered_df.T
 
-    concentration_list = []
+    trait_list = []
     for sample in wgcna_df.index:
-        group = sample.split('_')[0]
-        trait_value = trait_dict.get(group, 0)
-        concentration_list.append(trait_value)
+        if sample.startswith(control_prefix):
+            trait_list.append(0)
+        elif sample.startswith(treatment_prefix):
+            trait_list.append(1)
 
-    traits_df = pd.DataFrame({"Plastic_Concentration": concentration_list}, index=wgcna_df.index)
+    traits_df = pd.DataFrame({"Treatment_Status": trait_list}, index=wgcna_df.index)
 
-    network = PyWGCNA.WGCNA(name="Microplastics_Network", species="Mus musculus", 
+    network_name = f"WGCNA_{treatment_prefix}_vs_{control_prefix}"
+    print(f"\nBuilding Network: {network_name} with {len(wgcna_df.index)} samples...")
+    
+    network = PyWGCNA.WGCNA(name=network_name, species="Mus musculus", 
                             geneExp=wgcna_df, save=False)
     
     network.preprocess()
     network.findModules()
-    network.updateSampleInfo(traits_df)
+    network.updateSampleInfo(sampleInfo=traits_df)
 
     module_colors = network.datExpr.var['moduleColors']
 
@@ -77,6 +86,7 @@ def run_wgcna_pipeline(counts_df: pd.DataFrame, top_n_genes: int, output_csv_pat
         "WGCNA_Module": module_colors.values
     })
     result_df.to_csv(output_csv_path, index=False)
+    print(f"Master file saved to: {output_csv_path}")
 
     module_dfs_dict = {}
     unique_colors = module_colors.unique()
@@ -85,13 +95,4 @@ def run_wgcna_pipeline(counts_df: pd.DataFrame, top_n_genes: int, output_csv_pat
         color_genes = module_colors[module_colors == color].index
         module_dfs_dict[color] = filtered_df.loc[color_genes].copy()
         
-    print(f"Network complete! {len(unique_colors)} modules (colors) identified.")
-    
     return module_dfs_dict
-
-def save_module_gene_ids(module_dict: dict, output_dir: str):
-    os.makedirs(output_dir, exist_ok=True)
-    
-    for color, df in module_dict.items():
-        file_path = os.path.join(output_dir, f"wgcna_module_{color}.csv")
-        pd.Series(df.index, name="gene_id").to_csv(file_path, index=False)
