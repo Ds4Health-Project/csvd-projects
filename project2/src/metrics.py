@@ -22,14 +22,21 @@ def calculate_log2fc(
 
 
 def filter_significant_genes(
-    df: pd.DataFrame, target_column: str, threshold: float = 1.0
+    df: pd.DataFrame, target_column: str, threshold: float = None, top_n: int = None
 ) -> pd.DataFrame:
-    filtered_genes = df[
-        (df[target_column] >= threshold) | (df[target_column] <= -threshold)
-    ].copy()
+    if target_column not in df.columns:
+        return None
 
-    original_count = len(df)
-    final_count = len(filtered_genes)
-    print(f"Genes discarded: {original_count - final_count}")
+    filtered_df = df.copy()
 
-    return filtered_genes
+    if threshold is not None:
+        filtered_df = filtered_df[
+            (filtered_df[target_column] >= threshold)
+            | (filtered_df[target_column] <= -threshold)
+        ]
+
+    if top_n is not None:
+        filtered_df["abs_val"] = filtered_df[target_column].abs()
+        filtered_df = filtered_df.nlargest(top_n, "abs_val").drop(columns=["abs_val"])
+
+    return filtered_df
