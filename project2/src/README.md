@@ -1,5 +1,3 @@
-
-
 # Instalar dependências
 
 No diretório `project2`, execute:
