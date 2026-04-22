@@ -1,2 +1,9 @@
 pandas
+numpy
+matplotlib
+seaborn
+scipy
+scikit-learn
+pydeseq2
+PyWGCNA
 GEOparse
