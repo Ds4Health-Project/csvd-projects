@@ -10,7 +10,7 @@ A pergunta central da pesquisa busca entender como diferentes tamanhos de partí
 
 # Slides
 
-- [Slides](assets/apresentacao.pdf)
+- [Slides](project2/assets/apresentacao.pdf)
 
 # Fundamentação Teórica
 
