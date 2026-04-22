@@ -44,42 +44,95 @@ O estudo de Chwiej et al. (2025) mostrou que partículas de poliestireno de 100 
 
 A metodologia integrará abordagens de transcriptômica e ciência de redes para mapear as respostas fenotípicas sistêmicas diante da exposição aos diferentes tamanhos de partículas de microplásticos. O projeto está estruturado nas seguintes etapas:
 
-**1. Aquisição e Pré-processamento dos Dados:**
-Os dados de expressão gênica serão obtidos a partir da série **GSE296007**, utilizando prioritariamente a matriz de contagens já disponibilizada pelo estudo. O conjunto contém 24 amostras distribuídas entre grupo controle e grupos expostos a partículas de 0,1 µm e 1 µm em diferentes concentrações, com réplicas biológicas. Após a inspeção da matriz, avaliação da consistência das amostras, filtragem de genes com baixa expressão e normalização dos dados para remover o viés de sequenciamento, buscaremos identificar quais genes são diferencialmente expressos nos HPFs frente à exposição às partículas de 0,1 µm e 1 µm em relação aos grupos controle.
+**1. Aquisição e Estruturação dos Dados**
 
-Também serão aplicadas análises exploratórias para detectar amostras heterogêneas, possíveis outliers e padrões globais de separação entre grupos experimentais. Exemplos de técnicas aplicadas nessa etapa incluirão:
+Os dados transcriptômicos utilizados neste projeto foram obtidos a partir da série GSE296007, depositada no Gene Expression Omnibus (GEO). De acordo com o artigo base, o experimento foi realizado com fibroblastos pulmonares humanos (HPFs) expostos por 24 h a partículas de poliestireno de 100 nm e 1 µm, em condições selecionadas a partir dos ensaios de viabilidade e citotoxicidade. Para o subconjunto transcriptômico, foram utilizadas as condições MA100 (0,1 g/L), MB100 (0,01 g/L), MC100 (0,001 g/L), MA1 (0,1 g/L), MB1 (0,01 g/L), MC1 (0,001 g/L), MD1 (0,05 g/L) e o grupo controle (CTR), totalizando 24 amostras com réplicas biológicas. ([Chwiej et al., 2025](https://doi.org/10.1038/s41598-025-22947-7))
 
-- distribuição das contagens
-- clustering hierárquico de amostras
-- análise de componentes principais (PCA)
+Nesta etapa, já foi implementado um processo de ingestão e estruturação dos dados brutos de contagem gênica. Os arquivos individuais de contagem por amostra, no formato `.txt.gz`, foram lidos e agregados em uma única matriz de expressão gênica, na qual as linhas representam genes e as colunas representam amostras.
 
-**2. Construção das Redes de Coexpressão Gênica:**
-A análise de genes diferencialmente expressos será conduzida com **DESeq2/PyDESeq2**, comparando:
+Além disso, foi construída automaticamente uma tabela de metadados das amostras a partir dos identificadores presentes nos nomes dos arquivos. Essa tabela passou a registrar, para cada amostra, informações como grupo experimental, réplica biológica, condição de controle ou tratamento, tamanho da partícula e concentração aplicada. Como resultado, a etapa produziu dois artefatos centrais do pipeline:
 
-- cada grupo tratado vs controle;
-- pares de grupos com mesma concentração e tamanhos diferentes
-- contrastes adicionais de interesse para investigar efeitos
+- `microplastic_expression.csv`: matriz consolidada de contagens gênicas por amostra;
+- `microplastic_metadata.csv`: tabela de metadados experimentais.
 
-Os genes diferencialmente expressos serão definidos com base em significância estatística ajustada por múltiplos testes. Para responder como as partículas reconfiguram a topologia celular, utilizaremos as matrizes de expressão em redes onde os nós representam genes e as arestas representam a força de coexpressão entre eles, permitindo observar o sistema pulmonar de forma conectada e não como genes isolados.
+Essa estruturação foi necessária para viabilizar as etapas seguintes de controle de qualidade, análise de expressão diferencial e construção da rede de coexpressão gênica.
 
-**3. Técnicas de Ciência de Redes:**
+**2. Processamento e Exploração dos Dados**
 
-- **Detecção de Comunidades:** Aplicaremos algoritmos para agrupar as redes em módulos de genes altamente conectados. Para testar a hipótese da pesquisa, extrairemos esses módulos e faremos análises de enriquecimento funcional (Gene Ontology e KEGG). A meta é verificar se os módulos associados à rede de partículas de 0,1 µm apresentam forte enriquecimento para "função mitocondrial", e se os módulos da rede de 1 µm concentram funções de "homeostase proteica" e "integridade de membrana".
-- **Análise de Centralidade e Hubs:** Para descobrir quais hubs controlam o estado de estresse celular, calcularemos métricas de centralidade (Grau, Intermediação e Autovetor). Os genes com as maiores pontuações nesses módulos de estresse serão apontados como os reguladores moleculares primários da transição fibrótica.
-- **Comparação Topológica:** Calcularemos métricas macroscópicas da rede como o coeficiente de agrupamento e o tamanho do caminho característico para demonstrar o nível de fragmentação ou resiliência da rede do hospedeiro quando exposta a diferentes tamanhos de partículas.
+Após a estruturação inicial da base, foi implementada uma etapa de processamento com o objetivo de validar a consistência dos artefatos gerados e preparar os dados para as análises subsequentes de expressão diferencial e coexpressão gênica. Nessa fase, a matriz de expressão e a tabela de metadados foram carregadas e verificadas quanto ao alinhamento entre amostras, integridade dos identificadores e consistência estrutural dos valores de contagem.
+
+Em seguida, foram calculadas métricas de controle de qualidade por amostra, incluindo:
+
+- Soma total das contagens;
+- Número de genes detectados com contagem maior que zero;
+- Número de genes detectados com contagem maior ou igual a dez.
+
+Essas métricas foram utilizadas para exploração e para identificação preliminar de possíveis amostras discrepantes.
+
+Para exploração global dos perfis transcriptômicos, foram aplicadas transformações baseadas em CPM (counts per million) e log2(CPM + 1), utilizadas em análises de PCA e clustering hierárquico das amostras. Essas análises permitiram observar a estrutura global dos dados e verificar se os grupos experimentais apresentavam padrões de separação coerentes com as condições de exposição descritas no estudo-base.
+
+Por fim, foi realizada uma filtragem inicial de genes pouco expressos, mantendo apenas genes com:
+
+- CPM ≥ 1 em pelo menos 3 amostras;
+- Contagem total mínima ≥ 10.Cál
+
+Essa etapa foi essencial para reduzir ruído, melhorar a estabilidade das análises subsequentes e preparar a base para o cálculo de expressão diferencial e construção da rede de coexpressão gênica.
+
+**3. Cálculo da Expressão Diferencial**
+
+Com a matriz de contagens já filtrada, foi implementada uma etapa de análise de expressão diferencial com o objetivo de identificar genes cuja expressão varia significativamente entre condições experimentais. Para isso, a matriz de expressão foi reorganizada no formato esperado pelo PyDESeq2, com amostras nas linhas e genes nas colunas, e os metadados experimentais foram alinhados por sample_id.
+
+A modelagem estatística foi realizada com um desenho simples por condição experimental, no qual cada grupo do experimento foi tratado como uma categoria distinta. Foram avaliados dois conjuntos de contrastes:
+
+- comparações entre cada tratamento e o grupo controle:
+  - `MA100 vs CTR`
+  - `MB100 vs CTR`
+  - `MC100 vs CTR`
+  - `MA1 vs CTR`
+  - `MB1 vs CTR`
+  - `MC1 vs CTR`
+  - `MD1 vs CTR`
+
+- comparações pareadas entre partículas de 100 nm e 1 µm em concentrações equivalentes:
+  - `MA100 vs MA1`
+  - `MB100 vs MB1`
+  - `MC100 vs MC1`
+
+Os resultados de cada contraste foram armazenados em tabelas independentes de genes diferencialmente expressos, acompanhadas de estatísticas como log2FoldChange e pvalue. Essa etapa teve como finalidade responder quais genes são diferencialmente expressos em cada condição de exposição e fornecer insumos para a integração posterior entre análise diferencial, módulos de coexpressão e seleção de hubs.
+
+**4. Análise de Coexpressão Gênica**
+
+Com os dados já filtrados e a etapa de expressão diferencial concluída, foi implementada a análise de coexpressão gênica por meio de WGCNA (Weighted Gene Co-expression Network Analysis), com o objetivo de identificar módulos de genes que apresentassem comportamento coordenado ao longo das amostras e relacioná-los aos traços experimentais do estudo.
+
+Para essa etapa, foi utilizada uma matriz gerada anteriormente reorganizada no formato de amostras × genes, juntamente com a tabela de metadados experimentais. A construção da rede foi realizada com PyWGCNA. Após a execução da WGCNA, os módulos finais foram extraídos a partir da estrutura interna do objeto e organizados em uma tabela gene -> módulo. Em seguida, foram calculados os module eigengenes, que resumem o comportamento coletivo de cada módulo ao longo das amostras.
+
+Para a etapa de associação módulo-traço, optou-se por utilizar somente as amostras tratadas, removendo o grupo controle da correlação com os traços. Essa decisão teve como finalidade isolar melhor os efeitos de tamanho da partícula e concentração, evitando misturar o contraste controle vs. tratamento com o contraste entre 100 nm e 1 µm.
+
+Essa etapa permitiu identificar módulos potencialmente associados ao efeito do tamanho das partículas e do gradiente de concentração, fornecendo a base para a seleção posterior dos módulos prioritários, identificação de hubs e construção da rede final.
+
+**5. Construção e Análise de Redes de Interação**
+
+Para aprofundar a análise funcional dos genes identificados, será realizada a construção de redes de interação proteína-proteína (PPI). Inicialmente, os genes de interesse obtidos com WGCNA serão submetidos à plataforma STRING, que permite a geração de redes baseadas em interações conhecidas e preditas entre proteínas. As redes geradas serão então importadas para o software Cytoscape.
+
+Posteriormente, serão conduzidas análises topológicas mais detalhadas no Cytoscape. Nessa etapa, serão calculadas métricas de rede, como grau de conectividade, centralidade e identificação de nós altamente conectados (hubs), com o objetivo de identificar genes potencialmente centrais nos processos biológicos afetados.
 
 ## Bases de Dados e Evolução
 
-> Para cada base, coloque uma entrada na tabela no modelo a seguir e depois detalhamento sobre como ela foi analisada/usada, conforme exemplo a seguir.
+| Base de Dados | Endereço na Web                                              | Resumo descritivo                                                                                                                                                                                                                                                                                                           |
+| ------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GSE296007     | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE296007 | Série transcriptômica de RNA-seq com 24 amostras de fibroblastos pulmonares humanos (HPFs), incluindo grupo controle e grupos expostos a partículas de poliestireno de 0,1 µm e 1 µm em diferentes concentrações. A base fornece os dados necessários para análises de expressão diferencial e redes de coexpressão gênica. |
 
-> Base de Dados | Endereço na Web | Resumo descritivo
-> ----- | ----- | -----
-> Título da Base 1 | http://base1.org/ | Breve resumo (duas ou três linhas) sobre a base.
-> Título da Base 2 | http://base2.org/ | Breve resumo (duas ou três linhas) sobre a base.
+A base **GSE296007** constitui a principal fonte de dados do projeto. Ela reúne os dados de RNA-seq de HPFs expostos a partículas de poliestireno de 100 nm e 1 µm sob diferentes concentrações, além do grupo controle. A partir dessa base, foram utilizados os arquivos de contagem gênica por amostra para compor a entrada do pipeline analítico.
 
-> Faça uma descrição sobre o que concluiu sobre esta base. Sugere-se que respondam perguntas ou forneçam informações indicadas a seguir:
-> * O que descobriu sobre essa base?
-> * Quais as transformações e tratamentos (e.g., dados faltantes e limpeza) feitos?
+Na etapa inicial de preparação dos dados, a base foi analisada com o objetivo de consolidar os arquivos brutos em um formato matricial apropriado para análise estatística e de redes. Foram realizados:
+
+- Leitura dos arquivos de contagem individuais;
+- remoção de linhas técnicas não correspondentes a genes;
+- Padronização dos nomes de amostra;
+- Validação da presença das amostras esperadas;
+- Construção da matriz de expressão e da tabela de metadados.
+
+Com isso, a base deixou de ser um conjunto disperso de arquivos de contagem e passou a ser tratada como uma estrutura integrada.
 
 ## Modelo Lógico
 
@@ -87,34 +140,54 @@ Os genes diferencialmente expressos serão definidos com base em significância 
 > [modelo de base](https://docs.google.com/presentation/d/10RN7bDKUka_Ro2_41WyEE76Wxm4AioiJOrsh6BRY3Kk/edit?usp=sharing) para construir o seu.
 > Coloque a imagem do PNG do seu modelo lógico como ilustrado abaixo (a imagem estará na pasta `image`):
 >
-> ![Modelo Lógico de Grafos](images/modelo-logico-grafos.png)
+> ![Modelo Lógico de Grafos](../project1//assets/images/modelo_logico.jpeg)
 
 ## Integração entre Bases
 
-> Descreva se houve desafios de integração de fontes de dados.
+Até o estágio atual do projeto, a integração realizada ocorreu entre diferentes componentes da própria base transcriptômica GSE296007. Em vez de combinar bases biológicas distintas, foi necessário integrar:
+
+- Os **arquivos brutos de contagem gênica por amostra**;
+- A **estrutura experimental do estudo** descrita no artigo base;
+- Os **metadados inferidos a partir dos identificadores das amostras**, como grupo, réplica, tamanho da partícula e concentração.
+
+O principal desafio dessa integração consistiu em transformar um conjunto de arquivos independentes em uma representação tabular única e consistente, preservando o vínculo entre cada amostra e sua condição experimental. Para isso, foi implementado um processo de parsing dos nomes dos arquivos, validação das amostras esperadas e construção de uma tabela de metadados. Esse procedimento foi essencial para permitir o alinhamento entre expressão gênica e variáveis experimentais nas etapas posteriores de análise exploratória, expressão diferencial e WGCNA.
 
 ## Análise Preliminar
 
-> Este item não é obrigatório neste estágio. Apresente aqui uma análise preliminar dos dados se houver.
-> Utilize gráficos que descrevam os aspectos principais da base que são relevantes para as perguntas de pesquisa consideradas.
+Como etapa preliminar, os dados transcriptômicos passaram por uma inspeção exploratória com foco em controle de qualidade e preparação para análise estatística. Foram avaliadas métricas por amostra, como tamanho da biblioteca de contagens e número de genes detectados, com o objetivo de verificar a qualidade dos registros.
+
+Além disso, foram aplicadas transformações para permitir análises de redução de dimensionalidade e agrupamento. A PCA e o clustering hierárquico das amostras permitiram observar a estrutura global dos dados e detectar possíveis amostras heterogêneas. Essas análises também serviram para avaliar se os grupos experimentais apresentavam padrões compatíveis com o delineamento biológico descrito no artigo base.
+
+Em complemento, foi aplicada uma filtragem inicial de genes pouco expressos, reduzindo o conjunto de genes a uma matriz mais robusta para as etapas seguintes. Essa filtragem teve como finalidade remover ruído e aumentar a estabilidade das análises de expressão diferencial e coexpressão gênica.
+
+Além das análises exploratórias de QC, PCA e clustering realizadas na etapa anterior, foi executada uma análise de expressão diferencial com base na matriz de contagens filtrada. .
+Os resultados mostraram que algumas condições produzem alterações muito mais intensas que outras. Em especial, os contrastes envolvendo MA100, MC1 e MD1 apresentaram grande número de genes diferencialmente expressos, enquanto MB100 e MC100 apresentaram poucos ou nenhum gene significativo no critério adotado.
+
+Esses resultados da análise de expressão diferencial são coerentes com o estudo-base e indicam que a resposta transcriptômica depende da combinação entre tamanho da partícula e concentração, reforçando a necessidade de avançar para uma abordagem de redes que permita interpretar essas diferenças em nível sistêmico, e não apenas gene a gene.
+
+Por fim, foi conduzida a análise de coexpressão gênica com WGCNA, a partir da qual foram identificados módulos de genes coexpressos e calculados seus eigengenes. A associação entre módulos e traits experimentais, realizada apenas com as amostras tratadas, mostrou que alguns módulos apresentam maior relação com o eixo 100 nm vs 1 µm, enquanto outros respondem mais fortemente ao gradiente de concentração. 
 
 ## Evolução do Projeto
-> Este item não é obrigatório neste estágio, mas pode ser uma preparação para o estágio final.
-> Relatório de evolução, descrevendo as evoluções na modelagem do projeto, dificuldades enfrentadas, mudanças de rumo, melhorias e lições aprendidas. Referências aos diagramas, modelos e recortes de mudanças são bem-vindos.
-> Podem ser apresentados destaques na evolução dos modelos conceitual e lógico. O modelo inicial e intermediários (quando relevantes) e explicação de refinamentos, mudanças ou evolução do projeto que fundamentaram as decisões.
-> Relatar o processo para se alcançar os resultados é tão importante quanto os resultados.
+A evolução do projeto ocorreu de forma incremental e orientada pela necessidade de transformar dados brutos de RNA-seq em uma representação adequada para ciência de redes.
+
+Na primeira etapa, os arquivos brutos de contagem gênica por amostra foram integrados em uma matriz única de expressão e acompanhados de uma tabela de metadados construída a partir da estrutura experimental do estudo.
+
+Na segunda etapa, a matriz de expressão e os metadados passaram por processamento e exploração, incluindo validação da consistência entre expressão e metadados, cálculo de métricas de controle de qualidade, PCA, clustering hierárquico e filtragem de genes pouco expressos. Com isso, o projeto deixou de operar apenas com dados organizados e passou a contar com artefatos mais estáveis para modelagem posterior das redes.
+
+Na terceira etapa, foi implementada a análise de expressão diferencial com PyDESeq2. Essa fase permitiu quantificar a magnitude das alterações transcriptômicas entre os grupos tratados e o controle. Os resultados mostraram que a resposta não é uniforme entre os grupos, reforçando a importância de uma abordagem que vá além da análise gene a gene.
+
+Na quarta etapa, o projeto passou efetivamente a incorporar a perspectiva de ciência de redes, por meio da WGCNA. Foram identificados módulos de genes coexpressos, calculados seus eigengenes e estabelecidas correlações entre módulos e traços experimentais.
+
+Até este ponto, o projeto evoluiu de uma fase de estruturação e preparação dos dados para uma fase de interpretação sistêmica da resposta transcriptômica. O pipeline consolidado já permite sustentar a próxima etapa do trabalho, que seria a priorização de módulos, identificação de genes hub e construção da rede final para exploração no Cytoscape.
 
 # Ferramentas
 
 Durante o projeto, serão utilizadas ferramentas voltadas à análise de dados transcriptômicos e redes biológicas:
 
-- **Python (pandas, numpy, scipy, sanpy, plotly):** manipulação, preparação e visualizações avançadas dos dados.
+- **Python (pandas, numpy, scipy, scikit-learn, matplotlib):** manipulação, preparação e visualizações avançadas dos dados.
 - **PyDESeq2:** Biblioteca em Python para análise de expressão gênica diferencial.
 - **PyWGCNA:** Construção da rede ponderada de coexpressão gênica baseada na variância dos tratamentos.
-- **FastQC / Kallisto (ou STAR):** Ferramentas de bioinformática necessárias para o controle de qualidade e a quantificação/alinhamento das _reads_ de RNA.
-- **NetworkX / Graph-Tool / Cytoscape:** Bibliotecas centrais de Ciência de Redes para cálculos de centralidade, caminhos mínimos e aplicação de algoritmos de detecção de comunidades.
-- **GSEApy:** Realização de análises de enriquecimento de vias (GO/KEGG) para validar as funções biológicas associadas às hipóteses propostas.
-- **Py4Cytoscape:** Integração para renderização avançada da rede e customização de atributos visuais dos hubs.
+- **Cytoscape:** Softwares centrais de Ciência de Redes para cálculos de centralidade, caminhos mínimos e aplicação de algoritmos de detecção de comunidades.
 
 # Referências Bibliográficas
 
