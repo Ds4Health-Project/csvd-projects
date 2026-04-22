@@ -1,4 +1,0 @@
-pandas
-black
-GEOparse
-PyWGCNA
