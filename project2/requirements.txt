@@ -1,9 +1,12 @@
 pandas
 numpy
 matplotlib
+plotly
 seaborn
 scipy
 scikit-learn
 pydeseq2
 PyWGCNA
+mygene
+umap-learn
 GEOparse
