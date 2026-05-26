@@ -10,3 +10,5 @@ PyWGCNA
 mygene
 umap-learn
 GEOparse
+statsmodels
+kaleido

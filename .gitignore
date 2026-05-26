@@ -1,7 +1,6 @@
 .DS_Store
 venv/
 .venv/
-.claude/settings.local.json
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
@@ -10,3 +9,9 @@ venv/
 # Virtual environments / python cache
 __pycache__/
 .pytest_cache/
+
+# Arquivos pesados gerados pelo PyWGCNA (pickle do objeto WGCNA — pode passar de 2GB)
+*.p
+
+# Figuras auto-geradas pelo PyWGCNA (reproduzíveis via re-execução)
+project2/data/interim/wgcna/figures/
