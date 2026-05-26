@@ -74,7 +74,7 @@ Para exploração global dos perfis transcriptômicos, foram aplicadas transform
 Por fim, foi realizada uma filtragem inicial de genes pouco expressos, mantendo apenas genes com:
 
 - CPM ≥ 1 em pelo menos 3 amostras;
-- Contagem total mínima ≥ 10.Cál
+- Contagem total mínima ≥ 100.
 
 Essa etapa foi essencial para reduzir ruído, melhorar a estabilidade das análises subsequentes e preparar a base para o cálculo de expressão diferencial e construção da rede de coexpressão gênica.
 
