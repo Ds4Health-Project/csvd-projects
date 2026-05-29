@@ -114,7 +114,7 @@ Essa etapa permitiu identificar módulos com padrões de correlação com os tra
 
 **5. Enriquecimento Funcional**
 
-Para interpretar biologicamente os módulos identificados pelo WGCNA, será realizado enriquecimento funcional via GSEApy, consultando as bases GO (Biological Process e Molecular Function) e KEGG. Para cada módulo prioritário, a lista de genes será submetida ao Enrichr e os termos enriquecidos serão filtrados por FDR < 0,05. Essa etapa permite associar cada módulo a processos biológicos específicos — como disfunção mitocondrial ou resposta ao estresse — e direcionar a seleção de genes hub para a etapa de redes.
+Para interpretar biologicamente os módulos identificados pelo WGCNA, foi realizado enriquecimento funcional via GSEApy usando Fisher's exact test local (`gseapy.enrich`) com background dos 12.174 genes filtrados. Para cada um dos 4 módulos prioritários (ME_darkgrey, ME_tan, ME_linen, ME_darkred — padj < 0,10 para tamanho de partícula), foram consultadas as bases GO Biological Process 2023, GO Molecular Function 2023 e KEGG 2021 Human. Os termos enriquecidos foram filtrados por FDR < 0,05. Essa etapa permite associar cada módulo a processos biológicos específicos — como disfunção mitocondrial ou resposta ao estresse — e direcionar a seleção de genes hub para a etapa de redes.
 
 **6. Construção e Análise de Redes de Interação**
 
@@ -180,7 +180,9 @@ Na terceira etapa, foi implementada a análise de expressão diferencial com PyD
 
 Na quarta etapa, o projeto passou efetivamente a incorporar a perspectiva de ciência de redes, por meio da WGCNA. Foram identificados módulos de genes coexpressos, calculados seus eigengenes e estabelecidas correlações entre módulos e traços experimentais. Os parâmetros do WGCNA foram iterativamente ajustados (de `minModuleSize=50` para `minModuleSize=20`, `MEDissThres=0,2` para `0,25`), o que reduziu o percentual de genes não atribuídos de 40% para 32% e aumentou o número de módulos de 14 para 32. Os resultados de ambas as execuções foram preservados para comparação, com a versão original arquivada em `data/interim/wgcna/v_minmod50/`.
 
-Até este ponto, o projeto evoluiu de uma fase de estruturação e preparação dos dados para uma fase de interpretação sistêmica da resposta transcriptômica. O pipeline consolidado já permite sustentar a próxima etapa do trabalho: enriquecimento funcional dos módulos prioritários (GO/KEGG) e construção da rede de interação proteína-proteína para identificação de genes hub.
+Na quinta etapa, foi implementada a análise de enriquecimento funcional (notebook 004). Para cada um dos 4 módulos com associação significativa ao tamanho de partícula (padj < 0,10), foram realizados testes de enriquecimento com Fisher's exact test local via GSEApy (`gseapy.enrich`), consultando GO Biological Process 2023, GO Molecular Function 2023 e KEGG 2021 Human. O background utilizado foram os 12.174 genes filtrados, e os termos foram filtrados por FDR < 0,05.
+
+Até este ponto, o projeto evoluiu de uma fase de estruturação e preparação dos dados para uma fase de interpretação funcional dos módulos co-expressos. O pipeline consolidado já permite sustentar a próxima etapa: construção da rede de interação proteína-proteína (STRING) e identificação de genes hub por métricas topológicas (NetworkX).
 
 # Ferramentas
 
