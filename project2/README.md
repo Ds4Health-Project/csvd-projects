@@ -74,7 +74,7 @@ Para exploração global dos perfis transcriptômicos, foram aplicadas transform
 Por fim, foi realizada uma filtragem inicial de genes pouco expressos, mantendo apenas genes com:
 
 - CPM ≥ 1 em pelo menos 3 amostras;
-- Contagem total mínima ≥ 10.Cál
+- Contagem total mínima ≥ 100.
 
 Essa etapa foi essencial para reduzir ruído, melhorar a estabilidade das análises subsequentes e preparar a base para o cálculo de expressão diferencial e construção da rede de coexpressão gênica.
 
@@ -108,7 +108,9 @@ Para essa etapa, foi utilizada uma matriz gerada anteriormente reorganizada no f
 
 Para a etapa de associação módulo-traço, optou-se por utilizar somente as amostras tratadas, removendo o grupo controle da correlação com os traços. Essa decisão teve como finalidade isolar melhor os efeitos de tamanho da partícula e concentração, evitando misturar o contraste controle vs. tratamento com o contraste entre 100 nm e 1 µm.
 
-Essa etapa permitiu identificar módulos potencialmente associados ao efeito do tamanho das partículas e do gradiente de concentração, fornecendo a base para a seleção posterior dos módulos prioritários, identificação de hubs e construção da rede final.
+Para garantir o rigor estatístico das associações, foi aplicada correção por múltiplos testes (Benjamini-Hochberg, FDR) às 140 hipóteses simultâneas geradas pela matriz módulo × traço (14 módulos × 10 traços). Os p-values ajustados foram armazenados em uma tabela separada e incorporados ao resumo dos módulos.
+
+Essa etapa permitiu identificar módulos com padrões de correlação com os traços experimentais, fornecendo a base para a seleção posterior dos módulos prioritários, identificação de hubs e construção da rede final.
 
 **5. Construção e Análise de Redes de Interação**
 
@@ -161,7 +163,7 @@ Os resultados mostraram que algumas condições produzem alterações muito mais
 
 Esses resultados da análise de expressão diferencial são coerentes com o estudo-base e indicam que a resposta transcriptômica depende da combinação entre tamanho da partícula e concentração, reforçando a necessidade de avançar para uma abordagem de redes que permita interpretar essas diferenças em nível sistêmico, e não apenas gene a gene.
 
-Por fim, foi conduzida a análise de coexpressão gênica com WGCNA, a partir da qual foram identificados módulos de genes coexpressos e calculados seus eigengenes. A associação entre módulos e traits experimentais, realizada apenas com as amostras tratadas, mostrou que alguns módulos apresentam maior relação com o eixo 100 nm vs 1 µm, enquanto outros respondem mais fortemente ao gradiente de concentração. 
+Por fim, foi conduzida a análise de coexpressão gênica com WGCNA, a partir da qual foram identificados módulos de genes coexpressos e calculados seus eigengenes. A associação entre módulos e traits experimentais, realizada apenas com as amostras tratadas, revelou correlações brutas de intensidade variável com os eixos de tamanho de partícula e concentração. Após aplicação de correção por FDR (Benjamini-Hochberg) sobre as 140 hipóteses simultâneas, nenhum módulo apresentou associação estatisticamente significativa (padj < 0,05), o que pode refletir o tamanho amostral reduzido (n=21 amostras tratadas) ou indicar que os parâmetros do WGCNA (como `minModuleSize` e `power`) podem ser ajustados para capturar estrutura de coexpressão mais discriminativa. 
 
 ## Evolução do Projeto
 A evolução do projeto ocorreu de forma incremental e orientada pela necessidade de transformar dados brutos de RNA-seq em uma representação adequada para ciência de redes.
