@@ -108,11 +108,15 @@ Para essa etapa, foi utilizada uma matriz gerada anteriormente reorganizada no f
 
 Para a etapa de associação módulo-traço, optou-se por utilizar somente as amostras tratadas, removendo o grupo controle da correlação com os traços. Essa decisão teve como finalidade isolar melhor os efeitos de tamanho da partícula e concentração, evitando misturar o contraste controle vs. tratamento com o contraste entre 100 nm e 1 µm.
 
-Para garantir o rigor estatístico das associações, foi aplicada correção por múltiplos testes (Benjamini-Hochberg, FDR) às 140 hipóteses simultâneas geradas pela matriz módulo × traço (14 módulos × 10 traços). Os p-values ajustados foram armazenados em uma tabela separada e incorporados ao resumo dos módulos.
+Para garantir o rigor estatístico das associações, foi aplicada correção por múltiplos testes (Benjamini-Hochberg, FDR) às hipóteses simultâneas geradas pela matriz módulo × traço (32 módulos × 10 traços = 320 testes na configuração atual). Os p-values ajustados foram armazenados em uma tabela separada e incorporados ao resumo dos módulos.
 
 Essa etapa permitiu identificar módulos com padrões de correlação com os traços experimentais, fornecendo a base para a seleção posterior dos módulos prioritários, identificação de hubs e construção da rede final.
 
-**5. Construção e Análise de Redes de Interação**
+**5. Enriquecimento Funcional**
+
+Para interpretar biologicamente os módulos identificados pelo WGCNA, será realizado enriquecimento funcional via GSEApy, consultando as bases GO (Biological Process e Molecular Function) e KEGG. Para cada módulo prioritário, a lista de genes será submetida ao Enrichr e os termos enriquecidos serão filtrados por FDR < 0,05. Essa etapa permite associar cada módulo a processos biológicos específicos — como disfunção mitocondrial ou resposta ao estresse — e direcionar a seleção de genes hub para a etapa de redes.
+
+**6. Construção e Análise de Redes de Interação**
 
 Para aprofundar a análise funcional dos genes identificados, será realizada a construção de redes de interação proteína-proteína (PPI). Inicialmente, os genes de interesse obtidos com WGCNA serão submetidos à plataforma STRING, que permite a geração de redes baseadas em interações conhecidas e preditas entre proteínas. As redes geradas serão então importadas para o software Cytoscape.
 
@@ -163,7 +167,7 @@ Os resultados mostraram que algumas condições produzem alterações muito mais
 
 Esses resultados da análise de expressão diferencial são coerentes com o estudo-base e indicam que a resposta transcriptômica depende da combinação entre tamanho da partícula e concentração, reforçando a necessidade de avançar para uma abordagem de redes que permita interpretar essas diferenças em nível sistêmico, e não apenas gene a gene.
 
-Por fim, foi conduzida a análise de coexpressão gênica com WGCNA, a partir da qual foram identificados módulos de genes coexpressos e calculados seus eigengenes. A associação entre módulos e traits experimentais, realizada apenas com as amostras tratadas, revelou correlações brutas de intensidade variável com os eixos de tamanho de partícula e concentração. Após aplicação de correção por FDR (Benjamini-Hochberg) sobre as 140 hipóteses simultâneas, nenhum módulo apresentou associação estatisticamente significativa (padj < 0,05), o que pode refletir o tamanho amostral reduzido (n=21 amostras tratadas) ou indicar que os parâmetros do WGCNA (como `minModuleSize` e `power`) podem ser ajustados para capturar estrutura de coexpressão mais discriminativa. 
+Por fim, foi conduzida a análise de coexpressão gênica com WGCNA, a partir da qual foram identificados módulos de genes coexpressos e calculados seus eigengenes. A associação entre módulos e traits experimentais, realizada apenas com as amostras tratadas, revelou correlações com os eixos de tamanho de partícula e concentração. Uma primeira execução com `minModuleSize=50` produziu 14 módulos, com 40% dos genes não atribuídos (módulo dimgrey) e melhor padj de 0,09 para `particle_size_um`. Os parâmetros foram então ajustados para `minModuleSize=20` e `MEDissThres=0,25`, resultando em 32 módulos, redução do dimgrey para 32% e melhora do melhor padj para 0,062. Com critério exploratório de α=0,10 (FDR 10%), quatro módulos apresentaram associação significativa com o tamanho da partícula: dois com maior atividade em 1 µm (darkgrey, tan) e dois em 100 nm (linen, darkred). Nenhum módulo atinge padj < 0,05 com n=21 amostras tratadas, o que reflete a limitação de poder estatístico do dataset. A decisão sobre o threshold de significância a adotar nas etapas seguintes está em discussão com o grupo.
 
 ## Evolução do Projeto
 A evolução do projeto ocorreu de forma incremental e orientada pela necessidade de transformar dados brutos de RNA-seq em uma representação adequada para ciência de redes.
@@ -174,9 +178,9 @@ Na segunda etapa, a matriz de expressão e os metadados passaram por processamen
 
 Na terceira etapa, foi implementada a análise de expressão diferencial com PyDESeq2. Essa fase permitiu quantificar a magnitude das alterações transcriptômicas entre os grupos tratados e o controle. Os resultados mostraram que a resposta não é uniforme entre os grupos, reforçando a importância de uma abordagem que vá além da análise gene a gene.
 
-Na quarta etapa, o projeto passou efetivamente a incorporar a perspectiva de ciência de redes, por meio da WGCNA. Foram identificados módulos de genes coexpressos, calculados seus eigengenes e estabelecidas correlações entre módulos e traços experimentais.
+Na quarta etapa, o projeto passou efetivamente a incorporar a perspectiva de ciência de redes, por meio da WGCNA. Foram identificados módulos de genes coexpressos, calculados seus eigengenes e estabelecidas correlações entre módulos e traços experimentais. Os parâmetros do WGCNA foram iterativamente ajustados (de `minModuleSize=50` para `minModuleSize=20`, `MEDissThres=0,2` para `0,25`), o que reduziu o percentual de genes não atribuídos de 40% para 32% e aumentou o número de módulos de 14 para 32. Os resultados de ambas as execuções foram preservados para comparação, com a versão original arquivada em `data/interim/wgcna/v_minmod50/`.
 
-Até este ponto, o projeto evoluiu de uma fase de estruturação e preparação dos dados para uma fase de interpretação sistêmica da resposta transcriptômica. O pipeline consolidado já permite sustentar a próxima etapa do trabalho, que seria a priorização de módulos, identificação de genes hub e construção da rede final para exploração no Cytoscape.
+Até este ponto, o projeto evoluiu de uma fase de estruturação e preparação dos dados para uma fase de interpretação sistêmica da resposta transcriptômica. O pipeline consolidado já permite sustentar a próxima etapa do trabalho: enriquecimento funcional dos módulos prioritários (GO/KEGG) e construção da rede de interação proteína-proteína para identificação de genes hub.
 
 # Ferramentas
 
