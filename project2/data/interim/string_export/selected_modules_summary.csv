@@ -1,0 +1,6 @@
+module,n_unique_genes_in_module,n_deg_priority,fraction_deg_priority,n_priority_gene_contrast_hits,n_priority_contrasts_present,priority_contrasts_present,n_up_priority_rows,n_down_priority_rows
+dimgrey,3847,299,0.07772290096178841,437,5,MA100_vs_CTR;MA100_vs_MA1;MC100_vs_MC1;MC1_vs_CTR;MD1_vs_CTR,201,236
+darkgrey,3279,202,0.06160414760597743,262,5,MA100_vs_CTR;MA100_vs_MA1;MC100_vs_MC1;MC1_vs_CTR;MD1_vs_CTR,114,148
+gainsboro,1116,43,0.03853046594982079,72,4,MA100_vs_CTR;MC100_vs_MC1;MC1_vs_CTR;MD1_vs_CTR,47,25
+silver,2145,39,0.01818181818181818,45,4,MA100_vs_CTR;MA100_vs_MA1;MC100_vs_MC1;MC1_vs_CTR,35,10
+lightcoral,192,6,0.03125,6,1,MC100_vs_MC1,6,0
