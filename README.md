@@ -21,3 +21,5 @@ A pergunta central da pesquisa busca entender como diferentes tamanhos de partí
 
 # Entregas
 * [Entrega 1](project1/)
+* [Entrega 2](project2/)
+* [Entrega 3](project3-final/)
