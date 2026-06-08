@@ -161,37 +161,39 @@ Os 601 genes que são DEGs prioritários nesses 6 módulos foram submetidos ao S
 
 O enriquecimento funcional (ORA, FDR < 0,05) revelou que o módulo **dimgrey** é o único com enriquecimento robusto e biologicamente interpretável:
 
-- **GO Biological Process:** 7 termos significativos, incluindo _Cytoplasmic Translation_ (GO:0002181), _Ribosome Biogenesis_, _rRNA Processing_, _tRNA Aminoacylation_
-- **KEGG:** 3 vias significativas, incluindo _Ribosome_ (hsa03010)
+- **GO Biological Process:** 7 termos significativos — _Cytoplasmic Translation_ (GO:0002181, padj = 8,5×10⁻⁶), _Peptide Biosynthetic Process_, _Translation_, _Macromolecule Biosynthetic Process_, _Gene Expression_, _Ribosome Biogenesis_ e _Proton Motive Force-Driven ATP Synthesis_
+- **KEGG:** 3 vias significativas — _Ribosome_ (padj = 1,5×10⁻⁵, biologicamente relevante); _Coronavirus Disease_ e _Antigen Processing and Presentation_ (artefato de anotação: ambas impulsionadas pelos mesmos genes ribossomais, que o KEGG inclui nessas vias como maquinaria do hospedeiro explorada por patógenos)
 
-Os módulos white (8 genes input) e indianred (6 genes) apresentaram respectivamente 20 e 34 termos GO BP significativos, mas com listas de entrada muito pequenas — esses resultados são considerados exploratórios.
+Os demais módulos não apresentaram enriquecimento robusto: **darkgrey, gainsboro e mistyrose** retornaram 0 termos significativos (FDR < 0,05). Os módulos **white** (8 genes input) e **indianred** (6 genes) apresentaram respectivamente 20 e 34 termos GO BP significativos, mas com listas de entrada muito pequenas — esses resultados são considerados exploratórios e não conclusivos.
 
 ## Genes Hub Consensuais
 
 A análise cytoHubba na rede de alta confiança identificou genes hub pelas métricas MCC e Degree. Os TOP 10 de ambas as métricas foram **idênticos**, resultando em **10 genes hub consensuais**:
 
-| Gene | Função | Módulo | Regulação (1 µm) |
-|------|--------|--------|-----------------|
-| RPS2 | Proteína ribossomal 40S S2 | dimgrey | Downregulado |
-| RPS3 | Proteína ribossomal 40S S3 | dimgrey | Downregulado |
-| RPS3A | Proteína ribossomal 40S S3A | dimgrey | Downregulado |
-| RPSA | Proteína ribossomal 40S SA | dimgrey | Downregulado |
-| RPL3 | Proteína ribossomal 60S L3 | dimgrey | Downregulado |
-| RPL7 | Proteína ribossomal 60S L7 | dimgrey | Downregulado |
-| RPL26 | Proteína ribossomal 60S L26 | dimgrey | Downregulado |
-| RPL31 | Proteína ribossomal 60S L31 | dimgrey | Downregulado |
-| RPS23 | Proteína ribossomal 40S S23 | dimgrey | Downregulado |
-| RPS27 | Proteína ribossomal 40S S27 | dimgrey | Downregulado |
+| Gene | Função | Módulo | Contraste mais forte | Direção | log2FC |
+|------|--------|--------|----------------------|---------|--------|
+| RPS2 | Proteína ribossomal 40S S2 | dimgrey | MC100_vs_MC1 | ↑ em 100nm | +1,01 |
+| RPS3 | Proteína ribossomal 40S S3 | dimgrey | MC100_vs_MC1 | ↓ em 100nm | −1,04 |
+| RPS3A | Proteína ribossomal 40S S3A | dimgrey | MC100_vs_MC1 | ↑ em 100nm | +1,07 |
+| RPSA | Proteína ribossomal 40S SA | dimgrey | MC100_vs_MC1 | ↑ em 100nm | +1,16 |
+| RPL3 | Proteína ribossomal 60S L3 | dimgrey | MC100_vs_MC1 | ↑ em 100nm | +1,18 |
+| RPL7 | Proteína ribossomal 60S L7 | dimgrey | MC100_vs_MC1 | ↑ em 100nm | +1,11 |
+| RPL26 | Proteína ribossomal 60S L26 | dimgrey | MD1_vs_CTR | ↓ em 1µm | −1,33 |
+| RPS15A | Proteína ribossomal 40S S15A | dimgrey | MC100_vs_MC1 | ↑ em 100nm | +1,10 |
+| RPS23 | Proteína ribossomal 40S S23 | dimgrey | MA100_vs_CTR | ↓ em 100nm | −1,05 |
+| RPS27 | Proteína ribossomal 40S S27 | dimgrey | MC100_vs_MC1 | ↑ em 100nm | +1,18 |
 
 Todos os 10 genes hub pertencem ao módulo **dimgrey** e são proteínas ribossomais (subunidades 40S e 60S). Todos os 10 estão presentes no overlap do termo GO "Cytoplasmic Translation (GO:0002181)", demonstrando coerência biológica entre a centralidade topológica e a função anotada.
 
 # Discussão
 
-## Colapso da Maquinaria Ribossomal como Resposta Central a 1 µm
+## Divergência Ribossomal por Tamanho de Partícula
 
-O resultado mais consistente deste trabalho é que a exposição a partículas de poliestireno de 1 µm converge, tanto na análise de coexpressão (módulo dimgrey) quanto na topologia da rede PPI (hubs MCC/Degree), para **downregulação de proteínas ribossomais**. Os 10 genes hub consensuais são exclusivamente subunidades das subunidades 40S e 60S do ribossomo citoplásmatico, e todos aparecem no mesmo termo GO de máxima significância: _Cytoplasmic Translation_ (GO:0002181).
+O resultado mais consistente deste trabalho é que os genes hub consensuais são exclusivamente proteínas ribossomais (subunidades 40S e 60S), todas do módulo dimgrey, e todas aparecem no mesmo termo GO de máxima significância: _Cytoplasmic Translation_ (GO:0002181, padj = 8,5×10⁻⁶).
 
-Essa convergência confirma e estende os achados de Chwiej et al. (2025), que identificaram por DESeq2 simples a downregulação de RPS2, RPS3A e RPS20 em HPFs expostos a 1 µm. A abordagem de rede revela que esses genes não são regulados isoladamente: eles formam um módulo de coexpressão altamente coeso (dimgrey, 3.883 genes) com forte centralidade na rede de interação proteína-proteína. Isso sugere que a perturbação ribossomal é um **ponto de colapso topológico** da resposta celular, não apenas um artefato de genes individuais.
+A direção da regulação, porém, é mais nuançada do que uma simples downregulação por 1 µm. O contraste mais forte para 7 dos 10 hubs é **MC100_vs_MC1** — a comparação entre 100 nm e 1 µm em baixa concentração — e nesses genes o sinal é "up_in_MC100" (maior em 100 nm). Isso reflete o padrão descrito por Chwiej et al. (2025): em baixas concentrações, partículas de 100 nm **ativam** a maquinaria ribossomal enquanto as de 1 µm não o fazem, produzindo respostas opostas nos mesmos genes. RPL26 é exceção: seu contraste mais forte é MD1_vs_CTR, com downregulação direta pela exposição a 1 µm.
+
+A abordagem de rede revela que esses genes não são regulados isoladamente: formam um módulo de coexpressão altamente coeso (dimgrey, 3.883 genes) com forte centralidade na rede PPI. Isso sugere que a divergência ribossomal 100nm/1µm é um **fenômeno sistêmico de topologia de rede**, não um artefato de genes individuais.
 
 ## Paradoxo de Concentração-Tamanho
 
@@ -200,6 +202,10 @@ O contraste MC100_vs_MC1 (baixa concentração, comparação entre tamanhos) foi
 ## Módulos White e Indianred
 
 Os módulos white e indianred (6 genes DEGs cada) produziram numerosos termos significativos no ORA, o que é esperado quando a lista de entrada é muito pequena: com ≤ 10 genes, qualquer coincidência de 2–3 genes em um conjunto gênico tende a ser estatisticamente significativa por ORA. Esses resultados são tratados como exploratórios e não conclusivos.
+
+## darkgrey: Correlação com Tamanho, mas sem Enriquecimento
+
+O módulo **darkgrey** apresentou a maior correlação com tamanho de partícula (r = +0,622, padj = 0,059), mas retornou **0 termos significativos** no ORA. Isso pode refletir heterogeneidade funcional do módulo (3.266 genes, variedade de processos biológicos) ou limitação do Enrichr para capturar enriquecimentos difusos em módulos grandes. O dimgrey, por outro lado, com 302 DEGs prioritários focados em tradução, produziu o enriquecimento mais interpretável.
 
 ## Comparação com a Referência Metodológica (Sainz et al., 2024)
 
@@ -216,9 +222,9 @@ O pipeline seguido neste trabalho é análogo ao de Sainz et al. (2024), com dua
 
 # Conclusão
 
-Este trabalho demonstrou que a exposição de fibroblastos pulmonares humanos a partículas de poliestireno de 1 µm leva ao colapso coordenado da maquinaria de tradução citoplásmatica. A análise integrada de coexpressão gênica (WGCNA) e rede de interação proteína-proteína (STRING/cytoHubba) identificou o módulo **dimgrey** como o principal módulo resposta, enriquecido para _Cytoplasmic Translation_ e _Ribosome Biogenesis_, com 10 genes hub consensuais — todos proteínas ribossomais das subunidades 40S e 60S: **RPS2, RPS3, RPS3A, RPSA, RPL3, RPL7, RPL26, RPL31, RPS23 e RPS27**.
+Este trabalho demonstrou que a exposição de fibroblastos pulmonares humanos a partículas de poliestireno de 1 µm leva ao colapso coordenado da maquinaria de tradução citoplásmatica. A análise integrada de coexpressão gênica (WGCNA) e rede de interação proteína-proteína (STRING/cytoHubba) identificou o módulo **dimgrey** como o principal módulo resposta, enriquecido para _Cytoplasmic Translation_ e _Ribosome Biogenesis_, com 10 genes hub consensuais — todos proteínas ribossomais das subunidades 40S e 60S: **RPS2, RPS3, RPS3A, RPSA, RPL3, RPL7, RPL26, RPS15A, RPS23 e RPS27**.
 
-A identidade entre os TOP 10 hubs das métricas MCC e Degree reforça a robustez desse resultado. Esses genes são os mesmos identificados por Chwiej et al. (2025) como downregulados na análise clássica de genes isolados — a ciência de redes não apenas confirma esse achado, mas o eleva a um fenômeno sistêmico de centralidade topológica.
+A identidade entre os TOP 10 hubs das métricas MCC e Degree reforça a robustez desse resultado. O padrão dominante é de **maior expressão em 100 nm do que em 1 µm** (contraste MC100_vs_MC1) — espelho direto do paradoxo de concentração descrito por Chwiej et al. (2025), onde 100 nm ativa e 1 µm suprime os mesmos programas de síntese proteica. A ciência de redes não apenas confirma esse achado de genes isolados, mas o eleva a um fenômeno sistêmico de centralidade topológica.
 
 O projeto avança além do estudo original ao revelar a **hierarquia regulatória da resposta celular**: a perturbação ribossomal não é um conjunto disperso de genes desregulados, mas um colapso coordenado de um módulo topologicamente central. Esse tipo de análise é fundamental para identificar alvos terapêuticos relevantes em doenças respiratórias associadas à exposição a MNPs.
 

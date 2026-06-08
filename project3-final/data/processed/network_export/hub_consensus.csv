@@ -1,0 +1,11 @@
+gene_symbol,gene_name,primary_module,strongest_contrast,strongest_regulation,strongest_log2FoldChange,strongest_padj,n_contrasts,trait_support,in_mcc_10,in_mcc_20,in_degree_10,in_degree_20,n_lists
+RPS2,ribosomal protein S2,dimgrey,MC100_vs_MC1,up_in_tested,1.014028019697547,0.0011765334281989,1,False,True,True,True,True,4
+RPS3,ribosomal protein S3,dimgrey,MC100_vs_MC1,down_in_tested,-1.0406444437707607,0.0002318087853179,1,False,True,True,True,True,4
+RPSA,ribosomal protein SA,dimgrey,MC100_vs_MC1,up_in_tested,1.1562419520715033,1.4608262260693895e-09,1,False,True,True,True,True,4
+RPL3,ribosomal protein L3,dimgrey,MC100_vs_MC1,up_in_tested,1.1753651131380665,5.6804621938293536e-05,1,False,True,True,True,True,4
+RPL26,ribosomal protein L26,dimgrey,MD1_vs_CTR,down_in_tested,-1.3342681981798536,0.0026811067042501,3,False,True,True,True,True,4
+RPS27,ribosomal protein S27,dimgrey,MC100_vs_MC1,up_in_tested,1.177902369901619,1.0362428048793224e-05,1,False,True,True,True,True,4
+RPS23,ribosomal protein S23,dimgrey,MA100_vs_CTR,down_in_tested,-1.0517125363878792,0.0048339499198606,2,False,True,True,True,True,4
+RPL7,ribosomal protein L7,dimgrey,MC100_vs_MC1,up_in_tested,1.1111802731455074,2.005975603521357e-07,1,False,True,True,True,True,4
+RPS15A,ribosomal protein S15a,dimgrey,MC100_vs_MC1,up_in_tested,1.1005439542290745,1.5992769405270956e-08,1,False,True,True,True,True,4
+RPS3A,ribosomal protein S3A,dimgrey,MC100_vs_MC1,up_in_tested,1.072278644345266,3.924398423134712e-07,1,False,True,True,True,True,4
