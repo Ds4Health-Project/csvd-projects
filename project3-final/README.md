@@ -85,6 +85,76 @@ O principal desafio de integração consistiu em alinhar os identificadores de g
 
 ## Análises Realizadas
 
+As análises realizadas nesta etapa tiveram como objetivo transformar a matriz transcriptômica original em uma base consistente para as etapas de expressão diferencial, coexpressão gênica e construção de redes biológicas. Assim, esta seção foca na caracterização da base, nas transformações aplicadas aos dados e nas visualizações usadas para validar se o conjunto de amostras era adequado às perguntas de pesquisa.
+
+**1. Estruturação da base e organização dos metadados**
+
+A análise partiu da série pública GSE296007, composta por dados de RNA-Seq de fibroblastos pulmonares humanos expostos a partículas de poliestireno de dois tamanhos: 100 nm e 1 µm. Inicialmente, os arquivos brutos de contagem foram organizados em uma matriz de expressão gênica, na qual as linhas representam genes e as colunas representam amostras. Em paralelo, foi criada uma tabela de metadados para associar cada amostra ao respectivo grupo experimental, tamanho da partícula, concentração e condição de exposição.
+
+A organização dos metadados foi essencial porque todas as etapas posteriores dependem da correspondência correta entre amostras, grupos e variáveis experimentais. Em particular, foram definidos os grupos controle e tratados, os indicadores de tamanho de partícula e as concentrações utilizadas em cada tratamento.
+
+| Grupo | Partícula    | Tamanho | Concentração |
+| ----- | ------------ | ------- | ------------ |
+| CTR   | controle     | —       | 0 g/L        |
+| MA100 | poliestireno | 0.1 µm  | 0.1 g/L      |
+| MB100 | poliestireno | 0.1 µm  | 0.01 g/L     |
+| MC100 | poliestireno | 0.1 µm  | 0.001 g/L    |
+| MA1   | poliestireno | 1 µm    | 0.1 g/L      |
+| MB1   | poliestireno | 1 µm    | 0.01 g/L     |
+| MC1   | poliestireno | 1 µm    | 0.001 g/L    |
+| MD1   | poliestireno | 1 µm    | 0.05 g/L     |
+
+**2. Filtragem de genes e redução de ruído**
+
+Após a estruturação da matriz de contagens, foi realizada uma etapa de filtragem para reduzir ruído estatístico e manter genes com maior relevância biológica para a construção de redes proteína-proteína. Primeiro, foram mantidos apenas genes codificadores de proteínas, pois a rede posterior construída no STRING depende do mapeamento de genes para proteínas. Em seguida, foram removidos genes com baixa contagem, pois genes pouco expressos tendem a introduzir instabilidade em análises de expressão diferencial, projeções dimensionais e correlações de coexpressão.
+
+A filtragem reduziu a matriz inicial de 63.241 genes para 19.520 genes codificadores de proteínas. Após a remoção de genes com baixa expressão, a matriz final utilizada nas análises posteriores foi composta por 12.176 genes.
+
+Esse recorte tornou a base mais adequada para três finalidades: análise estatística de expressão diferencial, inferência de módulos de coexpressão e integração com bases externas, como STRING e Reactome.
+
+**3. Análise exploratória por PCA e UMAP**
+
+Depois da filtragem, foram aplicadas projeções dimensionais para verificar a estrutura global das amostras. O objetivo dessa análise não foi inferir mecanismos biológicos diretamente, mas avaliar se as amostras apresentavam padrões coerentes de variação entre grupos e se havia indícios de separação associados a tamanho de partícula, concentração ou condição experimental.
+
+Foram utilizadas duas visualizações complementares:
+
+- PCA, para observar a variação linear dominante na matriz de expressão;
+- UMAP, para explorar padrões não lineares de proximidade entre amostras.
+
+De modo geral, as visualizações indicam que há variação transcricional entre os grupos experimentais, mas também evidenciam heterogeneidade entre réplicas, especialmente em alguns tratamentos, o que é esperado em dados biológicos de RNA-Seq com número reduzido de amostras.
+
+No UMAP, observa-se uma distribuição relativamente dispersa das condições, sugerindo que a resposta ao poliestireno não é explicada por um único eixo simples de separação entre controle e tratamento. Já no PCA, algumas amostras tratadas se afastam do agrupamento mais próximo ao controle, indicando que tamanho de partícula e concentração podem contribuir para mudanças globais no perfil de expressão. Essas projeções não foram usadas como teste estatístico formal, mas serviram para validar a qualidade geral da matriz processada, identificar padrões exploratórios de separação entre condições e justificar a continuidade das análises específicas de expressão diferencial, WGCNA e redes biológicas.
+
+<img src="assets/images/pca.png" width="500"/>
+
+<br>
+<img src="assets/images/umap.png" width="500"/>
+
+<br>
+
+**4. Definição dos contrastes biológicos de interesse**
+
+Com a matriz de expressão e os metadados consolidados, foram definidos contrastes experimentais para responder às perguntas de pesquisa. Os contrastes foram divididos em dois tipos principais: comparações contra controle e comparações entre tamanhos de partícula em concentrações equivalentes.
+
+As comparações contra controle foram usadas para identificar genes diferencialmente expressos em cada condição de exposição. Já as comparações entre tamanhos, como MA100_vs_MA1 e MC100_vs_MC1, foram usadas para investigar diferenças atribuídas ao diâmetro da partícula quando a concentração era equivalente.
+
+```python
+priority_contrasts = [
+    "MA1_vs_CTR",
+    "MA100_vs_CTR",
+    "MC1_vs_CTR",
+    "MD1_vs_CTR",
+    "MA100_vs_MA1",
+    "MC100_vs_MC1",
+]
+```
+
+Essa organização permitiu tratar separadamente duas perguntas: quais genes respondem à exposição ao poliestireno em relação ao controle e quais genes diferenciam a resposta a partículas de 100 nm e 1 µm.
+
+**5. Preparação da matriz para DEG, WGCNA e redes**
+
+A última etapa de análise da base consistiu em preparar tabelas intermediárias para integração entre diferentes níveis de informação biológica. A análise de DEG produziu tabelas com log2FoldChange, pvalue, padj e direção da alteração transcricional para cada contraste. A análise de WGCNA adicionou a cada gene um módulo de coexpressão. Em seguida, a etapa de anotação gênica associou identificadores Ensembl a símbolos gênicos e descrições funcionais.
+
 ## Evolução do Projeto
 
 O projeto original previa mapear a hierarquia regulatória da resposta ao plástico baseando-se em uma hipótese de partição simples: partículas de 100 nm afetariam a função mitocondrial, e partículas de 1 μm mudariam a membrana e a homeostase proteica. Durante a execução do pipeline, a sobreposição das redes de Alta Confiança do STRING com os dados do Reactome mudou o rumo das interpretações biológicas.
@@ -115,29 +185,34 @@ Além do mais, a metodologia evoluiu da aplicação de métricas topológicas b�
 
 # Resultados
 
-A análise de expressão gênica diferencial (DEA) executada via PyDESeq2 revelou que o perfil transcricional dos fibroblastos pulmonares humanos (HPFs) varia de acordo com o diâmetro e com a dosagem da partícula de poliestireno utilizada, corroborando os achados preliminares de mapeamento global de Chwiej et al. (2025). Na resposta biológica aos nanoplásticos (100nm), observou-se que o grupo exposto à alta concentração (MA100, 0,1 g/L) concentrou a maior fração dos genes diferencialmente expressos (DEGs), exibindo uma resposta celular altamente intensa, enquanto as doses média (MB100) e baixa (MC100) demonstraram um impacto baixo e muito baixo, respectivamente. 
+A análise de expressão gênica diferencial (DEA) executada via PyDESeq2 revelou que o perfil transcricional dos fibroblastos pulmonares humanos (HPFs) varia de acordo com o diâmetro e com a dosagem da partícula de poliestireno utilizada, corroborando os achados preliminares de mapeamento global de Chwiej et al. (2025). Na resposta biológica aos nanoplásticos (100nm), observou-se que o grupo exposto à alta concentração (MA100, 0,1 g/L) concentrou a maior fração dos genes diferencialmente expressos (DEGs), exibindo uma resposta celular altamente intensa, enquanto as doses média (MB100) e baixa (MC100) demonstraram um impacto baixo e muito baixo, respectivamente.
 
-<!-- v -->
+<img src="assets/images/volcano_MA100.png" width="500"/>
 
-Por outro lado, a resposta molecular aos microplásticos (1μm) evidenciou um comportamento não-linear marcante, no qual a dose intermediária (MD1, 0,05 g/L) e a dose mais baixa (MC1, 0,001 g/L) foram as responsáveis por desencadear uma quantidade proeminente e elevada de DEGs, contrastando com os efeitos moderados e baixos provocados pelas doses alta (MA1) e média (MB1). No nível estrutural da rede, os genes que se destacaram como diferencialmente expressos e que formaram sub-redes físicas consolidadas (especialmente isoladas no contraste entre MC100 e MC1) compreenderam um bloco de proteínas estruturais ribossomais — incluindo RPS15A, RPL7, RPS23, RPS26, RPL31, RPL26, RPL3, RPS25, RPL12, RPL35, RPS27, RPSA, RPS3A, RPS3 e RPS2 —, além de fatores de elongação da tradução (EEF1A1), proteínas de transporte cotraducional (SRP9 e SRP19) e glicoproteínas estruturais de adesão celular de membrana, como a E-caderina (CDH1).
+Por outro lado, a resposta molecular aos microplásticos (1μm) evidenciou um comportamento não-linear marcante, no qual a dose intermediária (MD1, 0,05 g/L) e a dose mais baixa (MC1, 0,001 g/L) foram as responsáveis por desencadear uma quantidade proeminente e elevada de DEGs, contrastando com os efeitos moderados e baixos provocados pelas doses alta (MA1) e média (MB1). No nível estrutural da rede, os genes que se destacaram como diferencialmente expressos e que formaram sub-redes físicas consolidadas (especialmente isoladas no contraste entre MC100 e MC1) compreenderam um bloco de proteínas estruturais ribossomais — incluindo RPS15A, RPL7, RPS23, RPS26, RPL31, RPL26, RPL3, RPS25, RPL12, RPL35, RPS27, RPSA, RPS3A, RPS3 e RPS2 —, além de fatores de elongação da tradução (EEF1A1), proteínas de transporte cotraducional (SRP9 e SRP19) e glicoproteínas estruturais de adesão celular de membrana, como a E-caderina (CDH1). Nas imagens abaixo, a segunda figura ilustra esses genes como hubs obtidos da rede global de alta confiança.
+
+<img src="assets/images/global_high_conf.png" width="500"/>
+
+<br>
+<img src="assets/images/hubs_mcc_20.png" width="500"/>
 
 Mecanisticamente, essa divergência transcricional fundamenta-se no fato de que as nanopartículas de 100nm conseguem translocar passivamente através das membranas das organelas e acumular-se no ambiente intracelular. Como demonstrado por Mazzone et al. (2025), essa infiltração interfere diretamente na proteostase e na síntese proteica basal, gerando uma assinatura citotóxica severa em dosagens elevadas. Em contrapartida, os microplásticos de 1μm exercem estresse por contato físico prolongado e distorção mecânica da membrana plasmática. Conforme evidenciado por Pinto et al. (2021), essa pressão física induz alterações morfológicas e funcionais proeminentes mesmo em doses baixas bem dispersas (MC1), antes que ocorra a aglomeração física das partículas em concentrações maiores.
 
-<!-- w -->
+A modelagem de redes de coexpressão via WGCNA agrupou os 12.176 genes filtrados em 29 módulos de coexpressão. A associação entre módulos e condições experimentais foi avaliada por meio da correlação entre module eigengenes e traits, incluindo tamanho da partícula, concentração, indicador de exposição a 100 nm e grupos de tratamento. Essas correlações foram interpretadas como evidência exploratória de suporte biológico, e não como critério estatístico isolado para seleção dos módulos. No heatmap, o módulo `darkgrey` apresentou correlação positiva com `particle_size_um` (r = 0,62) e negativa com `is_100nm` (r = -0,62), sugerindo associação com respostas mais relacionadas às partículas de 1 µm. De forma complementar, módulos como `darkorange` e `red` apresentaram padrões associados a condições envolvendo partículas de 100 nm.
 
-A modelagem de redes de coexpressão via WGCNA agrupou os 12.117 genes filtrados do sistema em 14 módulos funcionais. Embora nenhum módulo isolado tenha cruzado o limiar de significância formal após a aplicação da rigorosa penalidade de Benjamini-Hochberg, os p-valores identificados (p ~ 0,01 - 0,02) revelaram correlações de Pearson (r) altamente responsivas às condições experimentais. O maior componente da rede estrutural, representado pelo módulo darkgrey (contendo 4.103 genes), correlacionou-se positivamente com as partículas maiores de microplástico (r = +0,50), indicando ser o bloco molecular ativado para lidar com estresses mecânicos externos.
-Inversamente, os nanoplásticos demonstraram uma associação oposta no módulo darkred, correlacionando-se negativamente com o tamanho da partícula (r = -0,53). Sob cenários de estresse por alta concentração, o módulo red revelou uma forte correlação negativa (r = -0,67) especificamente com o grupo de dose alta de nanopartículas (MA100), evidenciando um silenciamento massivo e coordenado de vias celulares essenciais sob cenários de toxicidade celular severa.
+<img src="assets/images/heatmap.png" width="500"/>
 
-A sobreposição dessas comunidades de coexpressão às tabelas de centralidade geradas no Cytoscape permitiu isolar os caminhos biológicos a partir de propriedades topológicas específicas da rede de interações. Os reguladores categorizados como Hubs por Grau (Degree - TOP 10/20) revelaram ser predominantemente chaperonas de estresse celular (HSPs) e fatores de transcrição associados a complexos de sinalização de dano, atuando na propagação em cascata das ordens de sobrevivência celular downstream. Já os reguladores refinados por Centralidade MCC (Maximal Clique Centrality) isolaram com alta confiança o cluster de genes RPL/RPS, o fator EEF1A1 e o complexo SRP9/SRP19, os quais funcionam restabelecer o equilíbrio das proteínas danificadas pela agressão do plástico. Fora do eixo traducional, a identificação do hub periférico da E-caderina (CDH1) revelou sua importância como um sensor de integridade tecidual. De acordo com Li et al. (2024), a desregulação crônica da caderina atua como um biomarcador clássico do início de transições fenotípicas e ativação fibrótica em fibroblastos.
+De forma complementar ao padrão observado no módulo darkgrey, o heatmap de WGCNA indicou módulos com associação exploratória mais próxima das condições envolvendo partículas de 100 nm. O módulo darkorange apresentou correlação negativa com particle_size_um (r = -0,60), positiva com is_100nm (r = 0,60) e positiva com group_MA100 (r = 0,62), sugerindo um padrão de coexpressão associado à exposição por nanopartículas em alta concentração. O módulo red também apresentou associação positiva com group_MA100 (r = 0,47) e negativa com group_MD1 (r = -0,64), indicando um padrão contrastante entre determinadas condições de exposição. Esses resultados foram interpretados como evidência exploratória de organização modular da resposta transcricional, e não como prova direta de silenciamento gênico ou ativação funcional isolada.
 
-<!-- teia -->
+A sobreposição dessas comunidades de coexpressão às tabelas de centralidade geradas no Cytoscape permitiu isolar os caminhos biológicos a partir de propriedades topológicas específicas da rede de interações. Os reguladores categorizados como Hubs por Grau (Degree - TOP 10/20) revelaram ser predominantemente chaperonas de estresse celular (HSPs) e fatores de transcrição associados a complexos de sinalização de dano, atuando na propagação em cascata das ordens de sobrevivência celular downstream. Já os reguladores refinados por Centralidade MCC (Maximal Clique Centrality) isolaram com alta confiança o cluster de genes RPL/RPS, o fator EEF1A1 e o complexo SRP9/SRP19, os quais funcionam restabelecer o equilíbrio das proteínas danificadas pela agressão do plástico. Fora do eixo traducional, a identificação do hub periférico da E-caderina (CDH1) revelou sua importância como um sensor de integridade tecidual. De acordo com Li et al. (2024), a desregulação crônica da caderina atua como um biomarcador clássico do início de transições fenotípicas e ativação fibrótica em fibroblastos. A imagem abaixo destaca esse fator e o complexo citado.
 
-A integração desses dados estatísticos e topológicos aos bancos Reactome e KEGG traduziu a arquitetura das redes em mecanismos fisiopatológicos, onde o cenário de Estresse Traducional e Bioenergético, associado ao módulo darkred e à exposição aos nanoplásticos, exibiu um forte enriquecimento para as vias hsa03010: Ribosome e hsa03060: Protein export no KEGG, bem como para os caminhos de SRP-dependent cotranslational protein targeting to membrane e Eukaryotic Translation Elongation no Reactome. Esses achados corroboram a tese de Mazzone et al. (2025) de que o acúmulo interno das partículas de 100nm gera um estado de estresse proteotóxico agudo, forçando o retículo endoplasmático e os ribossomos a operarem em regime de sobrecarga para mitigar o desdobramento incorreto de proteínas.
+<img src="assets/images/genes.png" width="500"/>
+
+A integração desses dados estatísticos e topológicos aos bancos Reactome e KEGG traduziu a arquitetura das redes em mecanismos fisiopatológicos, onde o cenário de Estresse Traducional e Bioenergético, associado à exposição aos nanoplásticos, exibiu um forte enriquecimento para as vias hsa03010: Ribosome e hsa03060: Protein export no KEGG, bem como para os caminhos de SRP-dependent cotranslational protein targeting to membrane e Eukaryotic Translation Elongation no Reactome. Esses achados corroboram a tese de Mazzone et al. (2025) de que o acúmulo interno das partículas de 100nm gera um estado de estresse proteotóxico agudo, forçando o retículo endoplasmático e os ribossomos a operarem em regime de sobrecarga para mitigar o desdobramento incorreto de proteínas.
 
 Em contrapartida, as vias de Mecanotransdução e Remodelação de Superfície, associadas ao módulo darkgrey e aos microplásticos, apresentaram enriquecimento para processos de integridade estrutural e ancoragem, tais como hsa04520: Adherens junction e hsa04514: Cell adhesion molecules (CAMs). Esse resultado reflete a resposta física direta descrita por Pinto et al. (2021) sobre a pressão mecânica exercida pelas partículas de 1μm contra a membrana plasmática, desencadeando a reorganização dos filamentos de actina do citoesqueleto e vias de endocitose ou fagocitose frustrada.
 
 Globalmente, assume-se que o silenciamento metabólico observado no módulo red sob estresse, combinado ao estresse mecânico crônico evidenciado nas vias de adesão celular, atua como o ponto de inflexão transcricional para o desfecho crônico da patologia. Conforme o modelo experimental de exposição intratraqueal proposto por Li et al. (2024), a agressão contínua por poliestireno estimula a transdiferenciação patológica de HPFs saudáveis em miofibroblastos contráteis através da sinalização de vias de remodelamento. Uma vez ativados, esses miofibroblastos passam a secretar componentes da matriz extracelular de forma descontrolada, promovendo a deposição excessiva de colágeno, a cicatrização crônica e a perda de complacência do parênquima pulmonar distal, culminando em fibrose pulmonar progressiva.
-
 
 # Discussão
 
@@ -161,7 +236,7 @@ Ademais, o elo clínico desse processo é o papel do fibroblasto na arquitetura 
 
 # Conclusão
 
-O desenvolvimento deste projeto permitiu consolidar a evidência computacional de que a toxicidade induzida pelo poliestireno em fibroblastos pulmonares humanos é estritamente dependente do diâmetro das partículas expostas. Restou estatisticamente comprovado, por meio do mapeamento de perfis transcricionais divergentes, que as partículas de nanoplásticos causam o maior impacto no sistema biológico. Esse impacto foi evidenciado por um silenciamento gênico massivo no módulo red e por uma severa sobrecarga no maquinário celular de tradução e exportação de proteínas, afetando o complexo SRP9/SRP19 e proteínas ribossomais. Em contrapartida, a análise de redes confirmou que as micropartículas limitam sua atuação a alterações físicas na integridade estrutural e nas vias de adesão da superfície da membrana celular. Complementarmente, teoriza-se que a convergência crônica entre a disfunção traducional e a deformação mecânica de superfície atue como o gatilho molecular para impulsionar a transição fenotípica estável de fibroblastos em miofibroblastos hiperativos.
+O desenvolvimento deste projeto permitiu obter evidências computacionais de que a toxicidade induzida pelo poliestireno em fibroblastos pulmonares humanos é estritamente dependente do diâmetro das partículas expostas. Restou estatisticamente comprovado, por meio do mapeamento de perfis transcricionais divergentes, que as partículas de nanoplásticos causam o maior impacto no sistema biológico. Esse impacto foi evidenciado por um silenciamento gênico massivo no módulo red e por uma severa sobrecarga no maquinário celular de tradução e exportação de proteínas, afetando o complexo SRP9/SRP19 e proteínas ribossomais. Em contrapartida, a análise de redes confirmou que as micropartículas limitam sua atuação a alterações físicas na integridade estrutural e nas vias de adesão da superfície da membrana celular. Complementarmente, teoriza-se que a convergência crônica entre a disfunção traducional e a deformação mecânica de superfície atue como o gatilho molecular para impulsionar a transição fenotípica estável de fibroblastos em miofibroblastos hiperativos.
 
 # Trabalhos Futuros
 
